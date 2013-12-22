@@ -270,7 +270,7 @@ substitution in the keys or values.
 .. code-block:: yaml
 
   _env:
-    {COOL_NAMES}_TITLE: {COOL_TITLES}
+    {COOL_NAMES}: Sir {_KEY}-a-lot
 
 The `_env`_ key is treated a bit special by the file includer. Rather than
 actually drop it into the middle of a document, it merges the environment of
