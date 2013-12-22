@@ -262,10 +262,10 @@ Just so that it's explicit, Yamlicious includes a special key into the document 
 it returns, `_env`_, that maps to a dictionary of environment variables that
 were set when Yamlicious rendered the configuration file.
 
-Internally `_env`_ points at the variable environment used for string
-substitution. If you want to add to that environment, define `_env`_ in your
-configuration document. Just like with any other key, feel free to use string
-substitution in the keys or values.
+You can also use the `_env`_ key to set environment variables. It behaves just
+like any other key, except any key set underneath automatically makes its way
+into the environment. Other than that, there's nothing special about `_env`_.
+Feel free to use string substitution in the keys or values.
 
 .. code-block:: yaml
 
@@ -449,7 +449,7 @@ _include
 
   _include: <file-path>
 
-Evaluates to the loaded and processed the configuration document found at
+Evaluates to the loaded and processed configuration document found at
 ``file_path``.
 
 
