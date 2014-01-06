@@ -1,5 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/python
+import sys
+import yaml
 
-import yamlicious
+import yamlicious.loader
 
-#TODO
+sys.stdout.write(yaml.dump(yamlicious.loader.Loader().load(sys.stdin)))

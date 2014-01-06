@@ -635,7 +635,20 @@ TBD
 The Command
 ====================
 
-TBD
+Yamlicious comes with a convenient command, ``yamlicious``, that reads input
+from stdin and writes to stdout. It uses a default configuration, along with
+all environment variables, in order to process the yaml document fed to it on
+standard in::
+
+  [10:49:46][kderr@Kyles-MacBook-Pro][~/Repositories/derrley/yamlicious]
+  $ cat /tmp/test
+  Hello: "{PWD} is the current wd"
+
+
+  [10:49:52][kderr@Kyles-MacBook-Pro][~/Repositories/derrley/yamlicious]
+  $ cat /tmp/test | yamlicious
+  {Hello: /Users/kderr/Repositories/derrley/yamlicious is the current wd}
+
 
 The API
 =================

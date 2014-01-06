@@ -5,7 +5,7 @@ import re
 class Environment(object):
   
   def __init__(self, environment, include_envvars=None, exclude_envvars=None,
-               list_delim=','):
+               list_delimiter=None):
     """
     :Paramters:
       `environment`:
@@ -22,6 +22,7 @@ class Environment(object):
         this has no impact on the interpretation of variables declared in the
         doucment using ``_env``.
     """
+    list_delimiter = list_delimiter or ','
     if include_envvars is not None and exclude_envvars is not None:
       raise Exception('You can only include or exclude keys, not both.')
 
@@ -32,8 +33,8 @@ class Environment(object):
       if ((include_envvars is not None and k in include_envvars) or 
           (exclude_envvars is not None and k not in exclude_envvars) or
           (include_envvars is None and exclude_envvars is None)): 
-        if list_delim in v:
-          self._list_vars[k] = v.split(list_delim)
+        if list_delimiter in v:
+          self._list_vars[k] = v.split(list_delimiter)
         else:
           self._string_vars[k] = v
 
