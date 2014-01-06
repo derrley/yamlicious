@@ -155,7 +155,7 @@ becomes:
   - joey likes sally
   - joey likes mary
   - johnny likes sally
-  - jonny likes mary
+  - johnny likes mary
   - bobby likes sally
   - bobby likes mary
 
