@@ -44,14 +44,13 @@ searching, cleaning, or editing (with syntax highlighting) the file.
 Environment Variable Subtitution
 ---------------------------------
 
-Yamlicious gives your configuration file automatic access to the environment. Just
-pretend like every string you write in YAML is ``format()`` ed with ``os.environ``.
+Yamlicious gives your configuration file automatic access to the environment. 
 
 .. code-block:: yaml
 
   some:
     key:
-      user_{USER}: not cool
+      user_$(USER): not cool
       user_kyle: cool
 
 Don't worry. The Yamlicious API gives you (the developer) the ability to both
@@ -72,7 +71,7 @@ When substituting into a single value string
 
 .. code-block:: yaml
 
-  some_list: {MY_LIST}
+  some_list: $(MY_LIST)
 
 renders to the following, if ``MY_LIST=one,two,three`` is in the environment.
 
@@ -98,7 +97,7 @@ When substituting into a value list
 
   some_list:
     - first
-    - {LIST}
+    - $(LIST)
 
 becomes
 
@@ -123,7 +122,7 @@ variable in the environment, ``_KEY``, to help you out in this situation.
 
 .. code-block:: yaml
 
-  {LIST}: {_KEY} is in the list!
+  $(LIST): $(_KEY) is in the list!
 
 becomes
 
@@ -146,7 +145,7 @@ If ``BOYS=joey,johnny,bobby`` and ``GIRLS=sally,mary`` then:
 
 .. code-block:: yaml
 
-  "{BOYS} likes {GIRLS}"
+  "$(BOYS) likes $(GIRLS)"
 
 becomes:
 
@@ -202,7 +201,7 @@ configuration.
 .. code-block:: yaml
 
   user_settings:
-    _insert: {USER}/conf.yaml
+    _insert: $(USER)/conf.yaml
 
 
 Merge
@@ -344,12 +343,12 @@ disabled by default.
 
   case_configuration:
     '_case':
-      - '{USER}'
+      - '$(USER)'
       - {'kyle': 'is awesome'}
       - {'_otherwise': 'is not awesome'}
   cond_configuration:
     '_cond':
-      - {"{ENV} in ['test', 'prod']": 'go!'}
+      - {"$(ENV) in ['test', 'prod']": 'go!'}
       - {true: 'undefined'}
 
 Note the use of the python expression. This is mostly for convenience and
@@ -365,7 +364,7 @@ if ``GOOD_USERS=kyle,anthony``, then the following expression
 
   access_configuration:
     '_case':
-      - {'{GOOD_USERS}': 'go!'}
+      - {'$(GOOD_USERS)': 'go!'}
       - {'_otherwise':  'stay. :('}
 
 evaluates to
@@ -388,7 +387,7 @@ Be careful to not do something like this unless you really mean it:
 
   access_configuration:
     '_case':
-      - {'{GOOD_USERS}': '{_KEY}'}
+      - {'$(GOOD_USERS)': '$(_KEY)'}
       - {'_otherwise':  'stay. :('}
 
 While it will technically work, Yamlicious offers no definition for what the
@@ -422,7 +421,7 @@ The `insert`_ evaluation happens only when someone tries to look at the
 
 The `lazy_lookup`_ key delays functional key evaluation just like `lazy`_, and
 it also allows you to use string substitution of the special variable
-``{_KEY}`` to define how every key in the document is looked up. Rather than
+``$(_KEY)`` to define how every key in the document is looked up. Rather than
 defining a document for *every key* in the map, you define *one expression*
 that, after string subtitution, can evaluate to *any key*.
 
@@ -434,9 +433,9 @@ inspired by YAML configuration of SQL tables.
   tables:
     _lazy_lookup:
       _insert_merge:
-        - generic/schema/{_KEY}.table.yaml
-        - {SYSTEM}/schema/{_KEY}.table.yaml
-        - {INSTITUTION}/schema/{_KEY}.table.yaml
+        - generic/schema/$(_KEY).table.yaml
+        - $(SYSTEM)/schema/$(_KEY).table.yaml
+        - $(INSTITUTION)/schema/$(_KEY).table.yaml
 
 Note that there's nothing that prevents lazy-loaded documents from merging with
 one another. If you're feeling particularly masochistic, you can define this
@@ -448,11 +447,11 @@ confusing yet equivalent thing.
     _merge:
       - _lazy_lookup:
           _insert_merge:
-            - generic/schema/{_KEY}.table.yaml
-            - {SYSTEM}/schema/{_KEY}.table.yaml
+            - generic/schema/$(_KEY).table.yaml
+            - $(SYSTEM)/schema/$(_KEY).table.yaml
       - _lazy_lookup:
           _insert_merge:
-            - {INSTITUTION}/schema/{_KEY}.table.yaml
+            - $(INSTITUTION)/schema/$(_KEY).table.yaml
 
 Order Of Operations
 ====================
@@ -642,7 +641,7 @@ standard in::
 
   [10:49:46][kderr@Kyles-MacBook-Pro][~/Repositories/derrley/yamlicious]
   $ cat /tmp/test
-  Hello: "{PWD} is the current wd"
+  Hello: "$(PWD) is the current wd"
 
 
   [10:49:52][kderr@Kyles-MacBook-Pro][~/Repositories/derrley/yamlicious]

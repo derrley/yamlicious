@@ -69,7 +69,7 @@ class Environment(object):
     def sub_str(s, env):
       ret = s
       for k, v in env.iteritems():
-        ret = ret.replace('{' + k + '}', v)
+        ret = ret.replace('$({0})'.format(k), v)
 
       return ret
   

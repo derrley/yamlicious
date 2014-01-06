@@ -31,19 +31,19 @@ class SimpleString(SubTest):
     'TWO': 'The second',
   }
 
-  document = '{ONE} then {TWO}'
+  document = '$(ONE) then $(TWO)'
   expected = 'The first then The second'
 
 
 class UnboundVariable(SubTest):
-  document = '{UNBOUND}'
-  expected = '{UNBOUND}'
+  document = '$(UNBOUND)'
+  expected = '$(UNBOUND)'
 
 
 class UnusedList(SubTest):
   env = {'SOMETHING': '1,2'}
-  document = '{SOMETHING_ELSE}'
-  expected = '{SOMETHING_ELSE}'
+  document = '$(SOMETHING_ELSE)'
+  expected = '$(SOMETHING_ELSE)'
 
 
 class ListAndString(SubTest):
@@ -53,7 +53,7 @@ class ListAndString(SubTest):
     'SOME_LIST': 'First list,Second list',
   }
 
-  document = '{ONE} then {TWO} in {SOME_LIST}'
+  document = '$(ONE) then $(TWO) in $(SOME_LIST)'
   expected = [
     'The first then The second in First list',
     'The first then The second in Second list',
@@ -66,7 +66,7 @@ class DotProduct(SubTest):
     'GIRLS': 'sally,mary',
   }
 
-  document = '{BOYS} likes {GIRLS}'
+  document = '$(BOYS) likes $(GIRLS)'
   expected = [
     'joey likes sally', 
     'joey likes mary', 
@@ -83,7 +83,7 @@ class ListIntoDict(SubTest):
   }
 
   document = {
-    '{SOME_LIST}': 'List item'
+    '$(SOME_LIST)': 'List item'
   }
 
   expected = {
@@ -98,7 +98,7 @@ class ListIntoDictWithSpecialKey(SubTest):
   }
 
   document = {
-    '{SOME_LIST}': '{_KEY} is in the list' 
+    '$(SOME_LIST)': '$(_KEY) is in the list' 
   }
 
   expected = {
@@ -114,7 +114,7 @@ class ListIntoList(SubTest):
 
   document = [
     'nonlist entry',
-    '{SOME_LIST} entry', 
+    '$(SOME_LIST) entry', 
   ]
 
   expected = [
@@ -131,9 +131,9 @@ class NestedListDict(SubTest):
   }
 
   document = {
-    '{SOME_LIST}': [
+    '$(SOME_LIST)': [
       'value',
-      '{SOME_LIST} under {_KEY}',
+      '$(SOME_LIST) under $(_KEY)',
     ]
   }
 
