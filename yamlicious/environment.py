@@ -2,6 +2,10 @@ import collections
 import re
 
 
+class MergeException(Exception):
+  pass
+
+
 class Environment(object):
   
   def __init__(self, environment, include_envvars=None, exclude_envvars=None,
@@ -72,22 +76,24 @@ class Environment(object):
   def __iter__(self):
     return iter(self._env)
 
+  def dictcopy(self):
+    return dict(self._env)
+
   def iteritems(self):
     return self._env.iteritems()
 
   def merge(self, other):
     """Merge another environment with this one."""
-    if other.non_seed_keys.intersection(self.non_seed_keys):
-      raise Exception(
-        'Environments cannot merge because each defines nonseed key {0}'.format(k)
+    both = other.non_seed_keys.intersection(self.non_seed_keys)
+    if both:
+      raise MergeException(
+        'Both environments define nonseed keys {0}'.format(both)
       )
 
-    def merge(l, r):
-      return {k: r[k] if k in r else l[k] for k in set(l.keys() + r.keys())}
+    for k in other.non_seed_keys:
+      self[k] = other[k]
 
-    self._env = merge(other._env)
-    self._list_keys |= other._list_keys
-    self._string_keys |= other._string_keys
+    return self
 
   def substitute(self, document):
     """Perform string substitution on the given document"""
