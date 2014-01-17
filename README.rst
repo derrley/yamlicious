@@ -63,6 +63,11 @@ on the comma character. If a Yamlicious file substitutes a list variable into a
 string, that string renders into multiple strings (one for each value in the
 list variable).
 
+If a string references a variable that's not in the environment, yamlicious
+does not modify the string. It will leave the variable reference alone, ``$()``
+characters included. This makes string substitution have a neat property -- it
+can be applied to the same document iteratively as the environment grows.
+
 List substitution behavior varies subtly by situation.
 
 
@@ -81,13 +86,6 @@ renders to the following, if ``MY_LIST=one,two,three`` is in the environment.
     - one
     - two
     - three
-
-If the variable is not set, renders 
-
-
-.. code-block:: yaml
-
-  some_list: null
 
 
 When substituting into a value list
@@ -108,8 +106,6 @@ becomes
     - one
     - two
     - three
-
-If the variable is not set, simply adds nothing to the list.
 
 
 When substituting into a key string
