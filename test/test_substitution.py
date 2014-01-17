@@ -107,6 +107,63 @@ class ListIntoDictWithSpecialKey(SubTest):
   }
 
 
+class ListIntoDictWithNestedSpecialKey(SubTest):
+  env = {
+    'TOP_LIST': 'First,Second',
+    'BOTTOM_LIST': 'Third,Fourth',
+  }
+
+  document = {
+    '$(TOP_LIST)': {
+      '$(BOTTOM_LIST)': '$(_KEY) on top and $(__KEY) on bottom'
+    }
+  }
+
+  expected = {
+    'First': {
+      'Third': 'First on top and Third on bottom',
+      'Fourth': 'First on top and Fourth on bottom',
+    },
+
+    'Second': {
+      'Third': 'Second on top and Third on bottom',
+      'Fourth': 'Second on top and Fourth on bottom',
+    },
+  }
+
+
+class ListIntoDictWithNestedSpecialKeyThatSkipsLevel(SubTest):
+  env = {
+    'TOP_LIST': 'First,Second',
+    'BOTTOM_LIST': 'Third,Fourth',
+  }
+
+  document = {
+    '$(TOP_LIST)': {
+      'skip': {
+        '$(BOTTOM_LIST)': ['$(_KEY) on top $(__KEY) is skip and $(___KEY) on bottom',
+                           'other string']
+      }
+    }
+  }
+
+  expected = {
+    'First': {
+      'skip': {
+        'Third': ['First on top skip is skip and Third on bottom', 'other string'],
+        'Fourth': ['First on top skip is skip and Fourth on bottom', 'other string'],
+      }
+    },
+
+    'Second': {
+      'skip': {
+        'Third': ['Second on top skip is skip and Third on bottom', 'other string'],
+        'Fourth': ['Second on top skip is skip and Fourth on bottom', 'other string'],
+      }
+    },
+  }
+
+
 class ListIntoList(SubTest):
   env = {
     'SOME_LIST': 'First,Second',

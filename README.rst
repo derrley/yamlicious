@@ -128,7 +128,23 @@ becomes
   two: two is in the list
   three: three is in the list
 
-If the variable is not set, adds no keys to the document.
+``_KEY`` is set to the first-level key in the document, regardless of whether
+the key was derived from string substitution. To get the second-level key, use
+``__KEY``, and so forth:
+
+.. code-block:: yaml
+  $(LIST):
+    second_level_key: $(_KEY) on top and $(__KEY) on bottom
+
+becomes
+
+.. code-block:: yaml
+  one:
+    second_level_key: one on top and second_level_key on bottom
+  two:
+    second_level_key: two on top and second_level_key on bottom
+  three:
+    second_level_key: three on top and second_level_key on bottom
 
 
 When substituting multiple list values into the same string

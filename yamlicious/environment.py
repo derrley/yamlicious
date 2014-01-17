@@ -95,7 +95,7 @@ class Environment(object):
 
     return self
 
-  def substitute(self, document):
+  def substitute(self, document, key_nest_level=1):
     """Perform string substitution on the given document"""
     
     # Perform substitution of a given subset of environment variables on a
@@ -136,9 +136,11 @@ class Environment(object):
       ret = {}
       for k, v in document.iteritems():
         for subk in sub(k):
-          self['_KEY'] = subk
-          ret[subk] = self.substitute(v)
-        del self['_KEY']
+          special = '_' * key_nest_level + 'KEY'
+          self[special] = subk
+          ret[subk] = self.substitute(v, key_nest_level + 1)
+
+        del self[special]
       return ret
 
     elif isinstance(document, collections.Iterable):
