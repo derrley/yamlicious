@@ -149,6 +149,6 @@ class Environment(object):
         if isinstance(v, basestring):
           ret += sub(v)
         else:
-          ret.append(self.substitute(v))
+          ret.append(self.substitute(v, key_nest_level))
 
       return ret

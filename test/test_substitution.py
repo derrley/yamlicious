@@ -207,3 +207,25 @@ class NestedListDict(SubTest):
       'Second under Second',
     ],
   }
+
+
+class TwoDictsInAList(SubTest):
+  """A failing substitution case I discovered while writing FK tests.
+
+  We weren't maintaining the special key depth as we traversed through a list!
+  """
+  env = {}
+
+  document = {
+    '_merge': [
+      {'stuff': ['$(_KEY) and $(__KEY)']},
+      {'_insert': '$(_KEY) and $(__KEY)'}
+    ]
+  }
+
+  expected = {
+    '_merge': [
+      {'stuff': ['_merge and stuff']},
+      {'_insert': '_merge and _insert'}
+    ]
+  }
