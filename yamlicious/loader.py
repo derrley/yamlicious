@@ -40,12 +40,18 @@ class Loader(object):
       self.list_delimiter
     )
 
-  def load_file(self, path):
-    with self.openfunc(path) as f:
+  def load_file(self, doc_path):
+    with self.openfunc(doc_path) as f:
       return self.load_stream(f)
 
-  def load_stream(self, f):
-    doc = yamlicious.document.Document(self.new_env(), yaml.load(f.read()))
+  def load_stream(self, doc_stream):
+    return self.load_string(doc_stream.read())
+
+  def load_string(self, doc_string):
+    return self.load_dict(yaml.load(doc_string))
+
+  def load_dict(self, doc_dict):
+    doc = yamlicious.document.Document(self.new_env(), doc_dict)
     doc.evaluate_feature_keys(self.keys)
 
     return doc
