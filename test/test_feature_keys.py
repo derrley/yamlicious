@@ -1,14 +1,21 @@
 import contextlib
-import StringIO
 import unittest
 
 import yamlicious.loader
+
+try:
+  import io
+except:
+  try:
+    import cStringIO as io
+  except:
+    import StringIO as io
 
 
 def make_fakefile(loader_files):
   @contextlib.contextmanager
   def fakeopen(fname):
-    yield StringIO.StringIO(loader_files[fname])
+    yield io.StringIO(loader_files[fname])
 
   return fakeopen
 
@@ -26,7 +33,7 @@ class TestInclude(unittest.TestCase):
 
     self.assertEquals(
       self.expect,
-      loader.load_stream(StringIO.StringIO(self.doc)).dict
+      loader.load_stream(io.StringIO(self.doc)).dict
     )
 
 
