@@ -60,6 +60,31 @@ class SimpleInclude(TestInclude):
   }
 
 
+class IncludeEnv(TestInclude):
+  loader_files = {
+    'doc': """
+      _env:
+        HI: stuff
+      stuff:
+        - is cool
+    """
+  }
+
+  doc = """
+    _include:
+      - doc
+    stuff:
+      - is $(HI)
+  """
+
+  expect = {
+    'stuff': [
+      'is stuff',
+      'is cool',
+    ]
+  }
+
+
 class InsertAndMerge(TestInclude):
   loader_files = {
     'doc': """
