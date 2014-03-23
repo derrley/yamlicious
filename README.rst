@@ -1,3 +1,6 @@
+
+.. image:: https://travis-ci.org/derrley/yamlicious.svg
+
 Yamlicious is a (work-in-progress) lightweight configuration library built on
 top of YAML. It's for folks who love to write their configuration files in
 YAML, but who find themselves writing additional boilerplate each time they
