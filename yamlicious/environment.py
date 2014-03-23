@@ -145,10 +145,10 @@ class Environment(object):
     elif isinstance(document, list):
       ret = []
       for v in document:
-        if isinstance(v, basestring):
-          ret += sub(v)
-        else:
+        if isinstance(v, dict) or isinstance(v, list):
           ret.append(self.substitute(v, key_nest_level))
+        else:
+          ret += sub(v)
 
       return ret
 
