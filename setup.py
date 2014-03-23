@@ -7,5 +7,6 @@ setup(
   scripts=[os.path.join('bin', p) for p in os.listdir('bin')],
   install_requires=[
     'pyyaml',
-  ]
+  ],
+  test_suite='test',
 )
