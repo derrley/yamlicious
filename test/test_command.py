@@ -14,14 +14,7 @@ class Command(unittest.TestCase):
     stdout = io.StringIO
 
     prc = subprocess.Popen(
-      ['bin/yamlicious'],
-      stdin=subprocess.PIPE,
-      stdout=subprocess.PIPE,
-      env={
-        'PYTHONPATH': '.:{0}'.format(
-          ':'.join(glob.glob('*.egg'))
-        )
-      }
+      ['yamlicious'], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
     )
     
     try:
