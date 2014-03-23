@@ -68,8 +68,8 @@ class Document(object):
 
     def traverse_dict(d):
       if isinstance(d, dict):
-        if len(d) == 1 and d.keys()[0] in fk_dict:
-          key = d.keys()[0]
+        if len(d) == 1 and list(d.keys())[0] in fk_dict:
+          key = list(d.keys())[0]
           doc = fk_dict[key].eval(self, traverse_dict(d[key]))
           self.env.merge(doc.env)
           return doc._dict
