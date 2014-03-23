@@ -104,8 +104,7 @@ class Environment(object):
   def substitute(self, document, key_nest_level=1):
     """Perform string substitution on the given document"""
     
-    # Perform substitution of a given subset of environment variables on a
-    # given string
+    # Perform string-variable substitution.
     def sub_str(s, env):
       ret = s
       for k, v in env.items():
@@ -115,7 +114,7 @@ class Environment(object):
   
     # Perform substitution on the given string
     def sub(s):
-      ret = set([sub_str(s, {k: self._dict[k] for k in self._string_keys})])
+      ret = [sub_str(s, {k: self._dict[k] for k in self._string_keys})]
 
       # Brute force approach. Run the string format operation for every value
       # of every variable. Runs on order of the number of variables in the
@@ -123,16 +122,23 @@ class Environment(object):
       # string. This is going to be slow as hell, but it might not matter, and
       # I can optimize it later. 
       for var in self._list_keys:
-        for smbr in list(ret):
-          start_size = len(ret)
-          ret.update(set(
-             sub_str(smbr, {var: v}) for v in self._dict[var]
-          ))
+        replace_with = []
+        for i, smbr in enumerate(ret):
+          lst_repl = [sub_str(smbr, {var: v}) for v in self._dict[var]]
 
-          if start_size != len(ret):
-            ret.discard(smbr)
+          if any([elt != smbr for elt in lst_repl]):
+            replace_with.append((i, lst_repl))
 
-      return list(ret)
+        offset = 0
+        for i, replace_list in replace_with:
+          del ret[i+offset]
+
+          for item in reversed(replace_list):
+            ret.insert(i+offset, item)
+
+          offset += len(replace_list) - 1
+
+      return ret
 
     if isinstance(document, dict):
       ret = {}
