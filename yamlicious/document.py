@@ -74,7 +74,7 @@ class Document(object):
           self.env.merge(doc.env)
           return doc._dict
         else:
-          return {k: traverse_dict(v) for k, v in d.iteritems()}
+          return {k: traverse_dict(v) for k, v in d.items()}
       elif isinstance(d, list):
         return [traverse_dict(i) for i in d]
       else:
@@ -85,7 +85,7 @@ class Document(object):
 
     # Handle document keys -- top level keys that disappear.
     delkeys = []
-    for k, v in self._dict.iteritems():
+    for k, v in self._dict.items():
       if k in fk_dict:
         fk_dict[k].eval(self, v)
         delkeys.append(k)

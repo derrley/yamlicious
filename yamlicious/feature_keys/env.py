@@ -5,7 +5,7 @@ class Env(object):
   validator = None
 
   def eval(self, doc, arg):
-    for k, v in arg.iteritems():
+    for k, v in arg.items():
       doc.env[k] = v
 
     doc.substitute()

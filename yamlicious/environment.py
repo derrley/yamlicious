@@ -36,7 +36,7 @@ class Environment(object):
     self._dict = {}
 
     environment_dict = environment_dict or {}
-    for k, v in environment_dict.iteritems():
+    for k, v in environment_dict.items():
       if ((include_envvars is not None and k in include_envvars) or 
           (exclude_envvars is not None and k not in exclude_envvars) or
           (include_envvars is None and exclude_envvars is None)): 
@@ -82,8 +82,8 @@ class Environment(object):
   def dictcopy(self):
     return dict(self._dict)
 
-  def iteritems(self):
-    return self._dict.iteritems()
+  def items(self):
+    return self._dict.items()
 
   def merge(self, other):
     """Merge another environment with this one."""
@@ -105,7 +105,7 @@ class Environment(object):
     # given string
     def sub_str(s, env):
       ret = s
-      for k, v in env.iteritems():
+      for k, v in env.items():
         ret = ret.replace('$({0})'.format(k), v)
 
       return ret
@@ -133,7 +133,7 @@ class Environment(object):
 
     if isinstance(document, dict):
       ret = {}
-      for k, v in document.iteritems():
+      for k, v in document.items():
         for subk in sub(k):
           special = '_' * key_nest_level + 'KEY'
           self[special] = subk

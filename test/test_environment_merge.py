@@ -16,7 +16,7 @@ class MergeTest(unittest.TestCase):
 
   def setUp(self):
     def update(e, vals):
-      for k, v in vals.iteritems():
+      for k, v in vals.items():
         e[k] = v
 
     self.left_env = yamlicious.environment.Environment(self.seed)
@@ -28,7 +28,7 @@ class MergeTest(unittest.TestCase):
   def runTest(self):
     if not self.merge_exception:
       self.left_env.merge(self.right_env)
-      self.assertItemsEqual(self.merge_expected.iteritems(), self.left_env.iteritems())
+      self.assertItemsEqual(self.merge_expected.items(), self.left_env.items())
     else:
       self.assertRaises(
         yamlicious.environment.MergeException,
