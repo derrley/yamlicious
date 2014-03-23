@@ -1,3 +1,4 @@
+import glob
 import io
 import subprocess
 import unittest
@@ -6,7 +7,7 @@ import yaml
 
 class Command(unittest.TestCase):
 
-  stdin = u''
+  stdin = ''
   expected = {}
 
   def runTest(self):
@@ -17,11 +18,17 @@ class Command(unittest.TestCase):
       stdin=subprocess.PIPE,
       stdout=subprocess.PIPE,
       env={
-        'PYTHONPATH': '.'
+        'PYTHONPATH': '.:{0}'.format(
+          ':'.join(glob.glob('*.egg'))
+        )
       }
     )
     
-    prc.stdin.write(self.stdin)
+    try:
+      prc.stdin.write(self.stdin)
+    except TypeError:
+      prc.stdin.write(bytes(self.stdin, 'UTF-8'))
+
     prc.stdin.close()
 
     self.assertEquals(self.expected, yaml.load(prc.stdout.read()))
@@ -29,7 +36,7 @@ class Command(unittest.TestCase):
 
 class CommandMerge(Command):
 
-  stdin = u"""\
+  stdin = """\
     _merge:
       - stuff:
         - is awesome
