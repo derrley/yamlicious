@@ -42,7 +42,6 @@ class Document(object):
 
     self.substitute()
 
-  @property
   def dict(self):
     return dict(self._dict)
 

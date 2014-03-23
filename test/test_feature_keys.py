@@ -33,7 +33,7 @@ class TestInclude(unittest.TestCase):
 
     self.assertEquals(
       self.expect,
-      loader.load_stream(make_stringio(self.doc)).dict
+      loader.load_stream(make_stringio(self.doc)).dict()
     )
 
 

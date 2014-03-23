@@ -2,6 +2,6 @@
 import sys
 import yaml
 
-import yamlicious.loader
+import yamlicious
 
-sys.stdout.write(yaml.dump(yamlicious.loader.Loader().load(sys.stdin)))
+sys.stdout.write(yaml.dump(yamlicious.loads(sys.stdin.read())))

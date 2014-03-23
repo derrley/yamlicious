@@ -17,7 +17,7 @@ class MergeTest(unittest.TestCase):
     )
 
 
-class MergeWithEnvTest(unittest.TestCase):
+class MergeWithEnvTest(MergeTest):
   """Tests that document merges include environment merge and substitution.
 
   This class tests that an envvar in a merged document is substituted into the
@@ -39,9 +39,3 @@ class MergeWithEnvTest(unittest.TestCase):
     {'one': 'hi',
       'two': 'hitwo'},
   )
-
-  def runTest(self):
-    self.assertEquals(
-      self.expect,
-      self.l.merge(self.r),
-    )
