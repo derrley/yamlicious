@@ -1,4 +1,3 @@
-import collections
 import re
 
 
@@ -8,11 +7,11 @@ class MergeException(Exception):
 
 class Environment(object):
   
-  def __init__(self, environment, include_envvars=None, exclude_envvars=None,
+  def __init__(self, environment_dict=None, include_envvars=None, exclude_envvars=None,
                list_delimiter=None):
     """
     :Paramters:
-      `environment`:
+      `environment_dict`:
         Dictionary representing the environment to load from. Pass os.environ
         here if you'd like to load the *real* environment.
 
@@ -34,53 +33,57 @@ class Environment(object):
     self._string_keys = set()
     self._list_keys = set()
     self._seed_keys = set()
-    self._env = {}
+    self._dict = {}
 
-    for k, v in environment.iteritems():
+    environment_dict = environment_dict or {}
+    for k, v in environment_dict.iteritems():
       if ((include_envvars is not None and k in include_envvars) or 
           (exclude_envvars is not None and k not in exclude_envvars) or
           (include_envvars is None and exclude_envvars is None)): 
         self[k] = v
 
-    self._seed_keys = set(environment.keys())
+    self._seed_keys = set(environment_dict.keys())
 
   @property
   def non_seed_keys(self):
     """A set of keys in the environment that were added after creation."""
-    return set(self._env) - self._seed_keys
+    return set(self._dict) - self._seed_keys
+
+  def __eq__(self, other):
+    return self._dict == other._dict
 
   def __setitem__(self, k, v):
     """Set a variable in the environment.
 
     NOTE: This function only has an effect if the seed environment did not
-          already define k. The seed (actual) environment supercedes the
-          document's environment.
+          already define k. The seed (actual) environment supercedes subsequent
+          mutation.
     """
     if k not in self._seed_keys:
       if self._list_delimiter in v:
-        self._env[k] = v.split(self._list_delimiter)
+        self._dict[k] = v.split(self._list_delimiter)
         self._list_keys.add(k)
       else:
-        self._env[k] = v
+        self._dict[k] = v
         self._string_keys.add(k)
 
   def __delitem__(self, k):
     if k not in self._seed_keys:
-      del self._env[k]
+      del self._dict[k]
       self._string_keys.discard(k)
       self._list_keys.discard(k)
 
   def __getitem__(self, k):
-    return self._env[k]
+    return self._dict[k]
 
   def __iter__(self):
-    return iter(self._env)
+    return iter(self._dict)
 
   def dictcopy(self):
-    return dict(self._env)
+    return dict(self._dict)
 
   def iteritems(self):
-    return self._env.iteritems()
+    return self._dict.iteritems()
 
   def merge(self, other):
     """Merge another environment with this one."""
@@ -90,7 +93,7 @@ class Environment(object):
         'Both environments define nonseed keys {0}'.format(both)
       )
 
-    for k in other.non_seed_keys:
+    for k in other:
       self[k] = other[k]
 
     return self
@@ -109,7 +112,7 @@ class Environment(object):
   
     # Perform substitution on the given string
     def sub(s):
-      ret = set([sub_str(s, {k: self._env[k] for k in self._string_keys})])
+      ret = set([sub_str(s, {k: self._dict[k] for k in self._string_keys})])
 
       # Brute force approach. Run the string format operation for every value
       # of every variable. Runs on order of the number of variables in the
@@ -120,7 +123,7 @@ class Environment(object):
         for smbr in list(ret):
           start_size = len(ret)
           ret.update(set(
-             sub_str(smbr, {var: v}) for v in self._env[var]
+             sub_str(smbr, {var: v}) for v in self._dict[var]
           ))
 
           if start_size != len(ret):
@@ -128,11 +131,7 @@ class Environment(object):
 
       return list(ret)
 
-    if isinstance(document, basestring):
-      ret = sub(document)
-      return ret if len(ret) != 1 else ret[0]
-
-    elif isinstance(document, collections.Mapping):
+    if isinstance(document, dict):
       ret = {}
       for k, v in document.iteritems():
         for subk in sub(k):
@@ -143,7 +142,7 @@ class Environment(object):
         del self[special]
       return ret
 
-    elif isinstance(document, collections.Iterable):
+    elif isinstance(document, list):
       ret = []
       for v in document:
         if isinstance(v, basestring):
@@ -152,3 +151,8 @@ class Environment(object):
           ret.append(self.substitute(v, key_nest_level))
 
       return ret
+
+    else:
+      ret = sub(document)
+      return ret if len(ret) != 1 else ret[0]
+

@@ -133,12 +133,14 @@ the key was derived from string substitution. To get the second-level key, use
 ``__KEY``, and so forth:
 
 .. code-block:: yaml
+
   $(LIST):
     second_level_key: $(_KEY) on top and $(__KEY) on bottom
 
 becomes
 
 .. code-block:: yaml
+
   one:
     second_level_key: one on top and second_level_key on bottom
   two:
@@ -308,11 +310,8 @@ environment.
 These variables can be used either in *the same document* (although the utility
 of that is not immediately obvious, other than for mitigating DRY violation)
 or, more importantly, *in documents that include it*. Yamlicious supports this
-by taking special care in its file loader, which merges the environment of the
-included document into the environment of the including document, and by
-running string substitution before and after document key evaluation, so that
-changes in the environment that happen during document key evaluation can be
-used in string substitutions elsewhere in the document.
+by taking special care to re-run string substitution each time it changes a
+document's environment. (Remember, string substitution is idempotent.)
 
 This behavior is somewhat dangerous if the included document defines a variable
 that's already defined in the including document. If the including document
@@ -321,7 +320,7 @@ can happen using only the *initial* version of the environment (before it is
 mutated by the act of inclusion). If the included document then changes any key
 that's used in the process of inclusion, things get hard to reason about.
 
-Rather than allow such craziness, Yamlicious just bans it. That is, it does not
+Rather than allow such craziness, Yamlicious bans it. That is, it does not
 allow multiple documents included in the same parent document to define
 differing versions of the same environment variable. It does allow actual
 environment variables to coexist with (and override) those defined in `env`_.
@@ -490,7 +489,6 @@ entire document that they're placed inside. They disappear when rendered.
 
 env 
 ````````````````````````````````
-(NOT IMPLEMENTED)
 
 .. code-block:: yaml
 
@@ -502,7 +500,6 @@ Sets document environment variables to given values.
 
 include
 `````````````````
-(NOT IMPLEMENTED)
 
 .. code-block:: yaml
 
@@ -528,7 +525,6 @@ itself, describes a transformation operation on the given document.
 
 insert
 ````````````````````````````````
-(NOT IMPLEMENTED)
 
 .. code-block:: yaml
 
@@ -540,7 +536,6 @@ Evaluates to the loaded and processed configuration document found at
 
 merge
 ````````````````````````````````
-(NOT IMPLEMENTED)
 
 .. code-block:: yaml
 
@@ -552,7 +547,6 @@ merge dictionaries and lists, but nothing else.
 
 merge_override
 ````````````````````````````````
-(NOT IMPLEMENTED)
 
 .. code-block:: yaml
 
@@ -565,7 +559,6 @@ in the list.
 
 insert_merge
 ````````````````````````````````
-(NOT IMPLEMENTED)
 
 .. code-block:: yaml
 
