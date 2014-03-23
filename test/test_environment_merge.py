@@ -28,7 +28,12 @@ class MergeTest(unittest.TestCase):
   def runTest(self):
     if not self.merge_exception:
       self.left_env.merge(self.right_env)
-      self.assertItemsEqual(self.merge_expected.items(), self.left_env.items())
+      if hasattr(self, 'assertItemsEqual'):
+        func = self.assertItemsEqual
+      else:
+        func = self.assertSameElements
+
+      func(self.merge_expected.items(), self.left_env.items())
     else:
       self.assertRaises(
         yamlicious.environment.MergeException,

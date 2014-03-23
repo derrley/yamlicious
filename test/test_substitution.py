@@ -20,7 +20,10 @@ class SubTest(unittest.TestCase):
 
     operation = self.assertEquals
     if isinstance(self.expected, list):
-      operation = self.assertItemsEqual
+      if hasattr(self, 'assertItemsEqual'):
+        operation = self.assertItemsEqual
+      else:
+        operation = self.assertSameElements
 
     operation(self.expected, env_under_test.substitute(self.document))
  
