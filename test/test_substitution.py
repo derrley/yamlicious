@@ -18,14 +18,11 @@ class SubTest(unittest.TestCase):
       self.exclude,
     )
 
-    operation = self.assertEquals
+    actual = env_under_test.substitute(self.document)
     if isinstance(self.expected, list):
-      if hasattr(self, 'assertItemsEqual'):
-        operation = self.assertItemsEqual
-      else:
-        operation = self.assertSameElements
-
-    operation(self.expected, env_under_test.substitute(self.document))
+      self.assertEquals(set(self.expected), set(actual))
+    else:
+      self.assertEquals(self.expected, actual)
  
 
 class SimpleString(SubTest):
@@ -200,8 +197,8 @@ class NestedListDict(SubTest):
   expected = {
     'First': [
       'value',
-      'Second under First',
       'First under First',
+      'Second under First',
     ],
 
     'Second': [

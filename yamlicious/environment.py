@@ -49,8 +49,11 @@ class Environment(object):
     """A set of keys in the environment that were added after creation."""
     return set(self._dict) - self._seed_keys
 
+  def dict(self):
+    return dict(self._dict)
+
   def __eq__(self, other):
-    return self._dict == other._dict
+    return hasattr(other, '_dict') and self._dict == other._dict
 
   def __setitem__(self, k, v):
     """Set a variable in the environment.
