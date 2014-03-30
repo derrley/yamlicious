@@ -148,5 +148,5 @@ class SubstitutionAfterMerge(MergeTest):
     self.left_env.merge(self.right_env)
 
     self.assertDictEqual(
-      self.sub_expected, self.left_env.dictcopy()
+      self.sub_expected, self.left_env.dict()
     )

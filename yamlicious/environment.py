@@ -82,9 +82,6 @@ class Environment(object):
   def __iter__(self):
     return iter(self._dict)
 
-  def dictcopy(self):
-    return dict(self._dict)
-
   def items(self):
     return self._dict.items()
 
