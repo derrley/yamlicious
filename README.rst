@@ -1,5 +1,5 @@
 
-.. image:: https://api.travis-ci.org/derrley/yamlicious.svg
+.. image:: https://api.travis-ci.org/derrley/yamlicious.png
   :target: https://travis-ci.org/derrley/yamlicious
 
 Yamlicious is a (work-in-progress) lightweight configuration library built on
