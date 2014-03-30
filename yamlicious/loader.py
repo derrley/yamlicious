@@ -40,18 +40,22 @@ class Loader(object):
       self.list_delimiter
     )
 
-  def load_file(self, doc_path):
+  def load_file(self, doc_path, default_doc=None):
     with self.openfunc(doc_path) as f:
-      return self.load_stream(f)
+      return self.load_stream(f, default_doc)
 
-  def load_stream(self, doc_stream):
-    return self.load_string(doc_stream.read())
+  def load_stream(self, doc_stream, default_doc=None):
+    return self.load_string(doc_stream.read(), default_doc)
 
-  def load_string(self, doc_string):
-    return self.load_dict(yaml.load(doc_string))
+  def load_string(self, doc_string, default_doc=None):
+    return self.load_dict(yaml.load(doc_string), default_doc)
 
-  def load_dict(self, doc_dict):
+  def load_dict(self, doc_dict, default_doc=None):
     doc = yamlicious.document.Document(self.new_env(), doc_dict)
+
+    if default_doc is not None:
+      doc = default_doc.merge(doc, safe=False)
+
     doc.evaluate_feature_keys(self.keys)
 
     return doc
