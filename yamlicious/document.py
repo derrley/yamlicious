@@ -45,6 +45,12 @@ class Document(object):
   def dict(self):
     return dict(self._dict)
 
+  def clone(self):
+    return Document(self.env.clone(), self.dict())
+
+  def make(self, document_dict):
+    return Document(self.env.clone(), document_dict)
+
   def substitute(self):
     """Run string substitution on the target document.
 

@@ -44,6 +44,16 @@ class Environment(object):
 
     self._seed_keys = set(environment_dict.keys())
 
+  def clone(self):
+    r = Environment()
+
+    r._string_keys = set(self._string_keys)
+    r._list_keys = set(self._list_keys)
+    r._seed_keys = set(self._seed_keys)
+    r._dict = dict(self._dict)
+
+    return r
+
   @property
   def non_seed_keys(self):
     """A set of keys in the environment that were added after creation."""

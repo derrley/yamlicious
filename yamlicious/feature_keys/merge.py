@@ -1,6 +1,3 @@
-import yamlicious.document as yd
-
-
 def merge_docs(docs, safe=True):
   doc = None
   for d in docs:
@@ -31,7 +28,7 @@ class Merge(LoaderBased):
   name = '_merge'
 
   def eval(self, doc, arg):
-    return merge_docs(yd.Document(doc.env, a) for a in arg)
+    return merge_docs(doc.make(a) for a in arg)
 
 
 class MergeOverride(LoaderBased):
@@ -39,7 +36,7 @@ class MergeOverride(LoaderBased):
   name = '_merge_override'
 
   def eval(self, doc, arg):
-    return merge_docs((yd.Document(doc.env, a) for a in arg), safe=False)
+    return merge_docs((doc.make(a) for a in arg), safe=False)
 
 
 class InsertMerge(LoaderBased):

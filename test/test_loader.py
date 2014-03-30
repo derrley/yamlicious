@@ -2,8 +2,6 @@ import unittest
 import os
 
 import yamlicious.loader
-# TODO: bad
-import yamlicious.document as yd
 
 import test.util
 
@@ -127,8 +125,7 @@ class ExtraFeatureKeys(LoaderTest):
     validator = None
 
     def eval(self, doc, arg):
-      # TODO: Bad -- uses constructor
-      return yd.Document(doc.env, 'yay!')
+      return doc.make('yay!')
 
   loader_args = {'extra_feature_keys': [TestKey()]}
 
