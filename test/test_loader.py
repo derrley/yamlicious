@@ -1,12 +1,16 @@
 import unittest
+import os
 
 import yamlicious.loader
+# TODO: bad
+import yamlicious.document as yd
 
 import test.util
 
 
 class LoaderTest(unittest.TestCase):
 
+  env = {}
   loader_args = {}
   default_doc = None
   doc = ''
@@ -20,6 +24,8 @@ class LoaderTest(unittest.TestCase):
         ),
         **self.loader_args
       )
+
+    os.environ.update(self.env)
 
     default_doc = None
     if self.default_doc is not None:
@@ -77,4 +83,60 @@ class DocumentIsUnsafeMerge(LoaderTest):
     'one': 'hi',
     'two': 'hi again',
     'three': 'should survive',
+  }
+
+
+class ListDelimiterTest(LoaderTest):
+
+  loader_args = {'list_delimiter': ':'}
+
+  env = {'THING': 'ONE:TWO'}
+
+  doc = """\
+    one: $(THING)
+  """
+
+  expected_doc_dict = {
+    'one': ['ONE', 'TWO']
+  }
+
+
+class ExcludeKeyNames(LoaderTest):
+
+  loader_args = {'exclude_key_names': ['_env']}
+
+  doc = """\
+    _env:
+      THING: hi
+    $(THING): $(_KEY)
+  """
+
+  expected_doc_dict = {
+    '_env': {
+      'THING': 'hi'
+    },
+    #TODO: Is this really a good idea?
+    '$(THING)': '$(THING)'
+  }
+
+
+class ExtraFeatureKeys(LoaderTest):
+
+  class TestKey(object):
+    name = '_test'
+    validator = None
+
+    def eval(self, doc, arg):
+      # TODO: Bad -- uses constructor
+      return yd.Document(doc.env, 'yay!')
+
+  loader_args = {'extra_feature_keys': [TestKey()]}
+
+  doc = """\
+    hello:
+      _test: stuff
+  """
+
+  expected_doc_dict = {
+    'hello': 'yay!'
   }
