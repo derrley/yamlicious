@@ -42,16 +42,18 @@ class Loader(object):
 
   def load_file(self, doc_path, default_doc=None):
     with self.openfunc(doc_path) as f:
-      return self.load_stream(f, default_doc)
+      return self.load_stream(f, default_doc, doc_path)
 
-  def load_stream(self, doc_stream, default_doc=None):
-    return self.load_string(doc_stream.read(), default_doc)
+  def load_stream(self, doc_stream, default_doc=None, doc_name=None):
+    return self.load_string(
+      doc_stream.read(), default_doc, doc_name or str(doc_stream)
+    )
 
-  def load_string(self, doc_string, default_doc=None):
-    return self.load_dict(yaml.load(doc_string), default_doc)
+  def load_string(self, doc_string, default_doc=None, doc_name=None):
+    return self.load_obj(yaml.load(doc_string), default_doc, doc_name)
 
-  def load_dict(self, doc_dict, default_doc=None):
-    doc = yamlicious.document.Document(self.new_env(), doc_dict)
+  def load_obj(self, doc_obj, default_doc=None, doc_name=None):
+    doc = yamlicious.document.Document(self.new_env(), doc_obj, doc_name)
 
     if default_doc is not None:
       doc = default_doc.merge(doc, safe=False)
