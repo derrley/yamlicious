@@ -12,11 +12,11 @@ class MergeTest(unittest.TestCase):
   def runTest(self):
     if isinstance(self.expect, type) and issubclass(self.expect, Exception):
       self.assertRaises(
-        self.expect, yamlicious.document.merge_dicts, self.l, self.r, self.safe
+        self.expect, yamlicious.document.merge_objs, self.l, self.r, self.safe
       )
     else:
       self.assertEquals(
-        self.expect, yamlicious.document.merge_dicts(self.l, self.r, self.safe)
+        self.expect, yamlicious.document.merge_objs(self.l, self.r, self.safe)
       )
 
 
@@ -104,3 +104,26 @@ class NestedOverlapDisjoint(MergeTest):
       'two': 2,
     }
   }
+
+
+class Lists(MergeTest):
+
+  l = [1, 2]
+
+  r = [3, 4]
+
+  expect = [1, 2, 3, 4]
+
+
+class Matching(MergeTest):
+
+  l = 1
+  r = 1
+  expect = 1
+
+
+class NonMatching(MergeTest):
+
+  l = 1
+  r = 2
+  expect = yamlicious.document.CantMergeType

@@ -1,3 +1,5 @@
+import copy
+import itertools
 import pprint
 import voluptuous
 
@@ -25,48 +27,60 @@ class FeatureKeyEvaluationError(Exception):
     )
 
 
-def merge_dicts(l, r, safe=True):
-  shared_keys = set(l.keys()) & set(r.keys())
-  new_dict = {}
+def merge_objs(l, r, safe=True):
+  if l is None:
+    return r
 
-  for k in shared_keys:
-    if not type(l[k]) == type(r[k]):
-      raise TypeMismatch(k, type(l[k]), type(r[k]))
+  if r is None:
+    return l
 
-    if isinstance(l[k], list):
-      new_dict[k] = l[k] + r[k]
-    elif isinstance(l[k], dict):
-      new_dict[k] = merge_dicts(l[k], r[k])
-    else:
-      if safe:
-        raise CantMergeType(k, type(l[k]))
-      else:
-        new_dict[k] = r[k]
+  if not type(l) == type(r):
+    raise TypeMismatch(l, r)
 
-  for d in l, r:
-    for k in set(d.keys()) - shared_keys:
-      new_dict[k] = d[k]
+  if isinstance(l, list):
+    return l + r
 
-  return new_dict
+  if isinstance(l, dict):
+    l_keys = set(l.keys())
+    r_keys = set(r.keys())
+    shared_keys = l_keys & r_keys
+    l_only_keys = l_keys - shared_keys
+    r_only_keys = r_keys - shared_keys
+
+    return dict(
+      itertools.chain(
+        ((k, merge_objs(l[k], r[k], safe)) for k in shared_keys),
+        ((k, l[k]) for k in l_only_keys),
+        ((k, r[k]) for k in r_only_keys),
+      )
+    )
+
+  if l == r:
+    return l
+
+  if safe:
+    raise CantMergeType(l, r)
+
+  return r
 
 
 class Document(object):
 
-  def __init__(self, env, document_dict=None, document_name=None):
+  def __init__(self, env, document_obj=None, document_name=None):
     self.env = env
-    self._dict = document_dict or {}
+    self._obj = document_obj
     self.name = document_name
 
     self.substitute()
 
-  def dict(self):
-    return dict(self._dict)
+  def obj(self):
+    return copy.deepcopy(self._obj)
 
   def clone(self):
-    return Document(self.env.clone(), self.dict())
+    return Document(self.env.clone(), self.obj())
 
-  def make(self, document_dict):
-    return Document(self.env.clone(), document_dict)
+  def make(self, document_obj):
+    return Document(self.env.clone(), document_obj)
 
   def substitute(self):
     """Run string substitution on the target document.
@@ -75,11 +89,11 @@ class Document(object):
     document in a way that could potentially resolve pending string
     substitutions.
     """
-    self._dict = self.env.substitute(self._dict)
+    self._obj = self.env.substitute(self._obj)
 
   def merge(self, document, safe=True):
     self.env.merge(document.env)
-    self._dict = merge_dicts(self._dict, document._dict, safe)
+    self._obj = merge_objs(self._obj, document._obj, safe)
 
     self.substitute()
 
@@ -98,41 +112,42 @@ class Document(object):
 
         if doc is not None:
           self.env.merge(doc.env)
-          return doc.dict()
+          return doc.obj()
 
       except voluptuous.Invalid:
         raise FeatureKeyEvaluationError(self, fk, val, path)
 
-    def traverse_dict(d, path):
+    def traverse(d, path):
       def path_plus(new_key):
         return path + '.' + new_key
 
       if isinstance(d, dict):
         if len(d) == 1 and list(d.keys())[0] in fk_dict:
           key = list(d.keys())[0]
-          return evaluate(key, traverse_dict(d[key], path_plus(key)), path)
+          return evaluate(key, traverse(d[key], path_plus(key)), path)
         else:
-          return {k: traverse_dict(v, path_plus(k)) for k, v in d.items()}
+          return {k: traverse(v, path_plus(k)) for k, v in d.items()}
       elif isinstance(d, list):
         return [
-          traverse_dict(itm, path_plus(str(idx))) for idx, itm in enumerate(d)
+          traverse(itm, path_plus(str(idx))) for idx, itm in enumerate(d)
         ]
       else:
         return d
 
     # Handle functional keys.
-    self._dict = traverse_dict(self._dict, '')
+    self._obj = traverse(self._obj, '')
 
     # Handle document keys -- top level keys that disappear.
-    delkeys = []
-    for k, v in self._dict.items():
-      if k in fk_dict:
-        evaluate(k, v, '')
-        delkeys.append(k)
+    if isinstance(self._obj, dict):
+      delkeys = []
+      for k, v in self._obj.items():
+        if k in fk_dict:
+          evaluate(k, v, '')
+          delkeys.append(k)
 
-    for k in delkeys:
-      del self._dict[k]
+      for k in delkeys:
+        del self._obj[k]
 
   def __eq__(self, other):
-    return (hasattr(other, '_dict') and hasattr(other, 'env') and
-            other._dict == self._dict and other.env == self.env)
+    return (hasattr(other, '_obj') and hasattr(other, 'env') and
+            other._obj == self._obj and other.env == self.env)

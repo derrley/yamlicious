@@ -147,6 +147,9 @@ class Environment(object):
 
       return ret
 
+    if document == None:
+      return document
+
     if isinstance(document, dict):
       ret = {}
       for k, v in document.items():
@@ -158,7 +161,7 @@ class Environment(object):
         del self[special]
       return ret
 
-    elif isinstance(document, list):
+    if isinstance(document, list):
       ret = []
       for v in document:
         if isinstance(v, dict) or isinstance(v, list):
@@ -168,7 +171,5 @@ class Environment(object):
 
       return ret
 
-    else:
-      ret = sub(document)
-      return ret if len(ret) != 1 else ret[0]
-
+    ret = sub(document)
+    return ret if len(ret) != 1 else ret[0]

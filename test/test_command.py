@@ -8,7 +8,7 @@ import yaml
 class Command(unittest.TestCase):
 
   stdin = ''
-  expected = {}
+  expected = None
 
   def runTest(self):
     stdout = io.StringIO

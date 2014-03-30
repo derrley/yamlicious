@@ -9,7 +9,7 @@ class TestInclude(unittest.TestCase):
 
   loader_files = {}
   doc = ''
-  expect = {}
+  expect = None
 
   def runTest(self):
     loader = yamlicious.loader.Loader(
@@ -25,7 +25,7 @@ class TestInclude(unittest.TestCase):
     else:
       self.assertEquals(
         self.expect,
-        loader.load_stream(make_stringio(self.doc)).dict()
+        loader.load_stream(make_stringio(self.doc)).obj()
       )
 
 

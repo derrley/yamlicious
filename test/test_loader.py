@@ -12,7 +12,7 @@ class LoaderTest(unittest.TestCase):
   loader_args = {}
   default_doc = None
   doc = ''
-  expected_doc_dict = {}
+  expected_doc_dict = None
 
   def runTest(self):
     def loader(content):
@@ -31,7 +31,7 @@ class LoaderTest(unittest.TestCase):
 
     self.assertEquals(
       self.expected_doc_dict,
-      loader(self.doc).load_file('file', default_doc).dict(),
+      loader(self.doc).load_file('file', default_doc).obj(),
     )
 
 
