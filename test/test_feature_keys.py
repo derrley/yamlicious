@@ -16,10 +16,17 @@ class TestInclude(unittest.TestCase):
       openfunc=make_fakefile(self.loader_files)
     )
 
-    self.assertEquals(
-      self.expect,
-      loader.load_stream(make_stringio(self.doc)).dict()
-    )
+    if isinstance(self.expect, type) and issubclass(self.expect, Exception):
+      self.assertRaises(
+        self.expect,
+        loader.load_stream,
+        make_stringio(self.doc),
+      )
+    else:
+      self.assertEquals(
+        self.expect,
+        loader.load_stream(make_stringio(self.doc)).dict()
+      )
 
 
 class SimpleInclude(TestInclude):
@@ -91,6 +98,24 @@ class InsertAndMerge(TestInclude):
       'is cool',
     ]
   }
+
+
+class InsertAndMergeValidationFailure(TestInclude):
+  loader_files = {
+    'doc': """
+      stuff:
+        - is cool
+    """
+  }
+
+  doc = """
+    _merge:
+      - stuff:
+        - is awesome
+      - _insert: [doc]
+  """
+
+  expect = yamlicious.document.FeatureKeyEvaluationError
 
 
 class InsertAndMergeOverride(TestInclude):

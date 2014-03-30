@@ -125,7 +125,7 @@ class ExtraFeatureKeys(LoaderTest):
     validator = None
 
     def eval(self, doc, arg):
-      return doc.make('yay!')
+      return doc.make({'yay!': ''})
 
   loader_args = {'extra_feature_keys': [TestKey()]}
 
@@ -135,5 +135,5 @@ class ExtraFeatureKeys(LoaderTest):
   """
 
   expected_doc_dict = {
-    'hello': 'yay!'
+    'hello': {'yay!': ''}
   }

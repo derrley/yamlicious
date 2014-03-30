@@ -1,4 +1,5 @@
-import yaml
+import pprint
+import voluptuous
 
 
 class TypeMismatch(Exception):
@@ -7,6 +8,21 @@ class TypeMismatch(Exception):
 
 class CantMergeType(Exception):
   pass
+
+
+class FeatureKeyEvaluationError(Exception):
+
+  def __init__(self, doc, fk, val, path):
+    s = 'In {0}, feature key at {1} failed validation:\n{2}\nvalidator: {3}'
+
+    super(FeatureKeyEvaluationError, self).__init__(
+      s.format(
+        doc.name or 'unknown document',
+        path or 'top of document',
+        pprint.pformat({fk.name: val}),
+        pprint.pformat({fk.name: fk.validator}),
+      )
+    )
 
 
 def merge_dicts(l, r, safe=True):
@@ -36,9 +52,10 @@ def merge_dicts(l, r, safe=True):
 
 class Document(object):
 
-  def __init__(self, env, document_dict=None):
+  def __init__(self, env, document_dict=None, document_name=None):
     self.env = env
     self._dict = document_dict or {}
+    self.name = document_name
 
     self.substitute()
 
@@ -71,28 +88,46 @@ class Document(object):
   def evaluate_feature_keys(self, feature_keys):
     fk_dict = {key.name: key for key in feature_keys}
 
-    def traverse_dict(d):
+    def evaluate(key, val, path):
+      fk = fk_dict[key]
+      try:
+        voluptuous.Schema(
+          fk.validator if fk.validator is not None else object
+        )(val)
+        doc = fk.eval(self, val)
+
+        if doc is not None:
+          self.env.merge(doc.env)
+          return doc.dict()
+
+      except voluptuous.Invalid:
+        raise FeatureKeyEvaluationError(self, fk, val, path)
+
+    def traverse_dict(d, path):
+      def path_plus(new_key):
+        return path + '.' + new_key
+
       if isinstance(d, dict):
         if len(d) == 1 and list(d.keys())[0] in fk_dict:
           key = list(d.keys())[0]
-          doc = fk_dict[key].eval(self, traverse_dict(d[key]))
-          self.env.merge(doc.env)
-          return doc._dict
+          return evaluate(key, traverse_dict(d[key], path_plus(key)), path)
         else:
-          return {k: traverse_dict(v) for k, v in d.items()}
+          return {k: traverse_dict(v, path_plus(k)) for k, v in d.items()}
       elif isinstance(d, list):
-        return [traverse_dict(i) for i in d]
+        return [
+          traverse_dict(itm, path_plus(str(idx))) for idx, itm in enumerate(d)
+        ]
       else:
         return d
 
     # Handle functional keys.
-    self._dict = traverse_dict(self._dict)
+    self._dict = traverse_dict(self._dict, '')
 
     # Handle document keys -- top level keys that disappear.
     delkeys = []
     for k, v in self._dict.items():
       if k in fk_dict:
-        fk_dict[k].eval(self, v)
+        evaluate(k, v, '')
         delkeys.append(k)
 
     for k in delkeys:

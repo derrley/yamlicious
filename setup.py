@@ -1,5 +1,4 @@
-from setuptools import setup, find_packages
-import os
+from setuptools import setup
 
 setup(
   name='yamlicious',
@@ -12,6 +11,7 @@ setup(
   ],
   install_requires=[
     'pyyaml',
+    'voluptuous',
   ],
   test_suite='test',
 )
