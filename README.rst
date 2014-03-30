@@ -297,8 +297,6 @@ to any map embedded anywhere in the document hierarchy, document feature keys
 apply behavior to the entire document, and therefore must exist at the top of
 the YAML document.
 
-.. code-block:: 
-
 
 Changing the Environment
 -------------------------
