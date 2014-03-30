@@ -40,24 +40,31 @@ class Loader(object):
       self.list_delimiter
     )
 
-  def load_file(self, doc_path, default_doc=None):
+  def load_file(self, doc_path, default_doc=None, validator=None):
     with self.openfunc(doc_path) as f:
-      return self.load_stream(f, default_doc, doc_path)
+      return self.load_stream(f, default_doc, doc_path, validator)
 
-  def load_stream(self, doc_stream, default_doc=None, doc_name=None):
+  def load_stream(self, doc_stream, default_doc=None, doc_name=None,
+                  validator=None):
     return self.load_string(
-      doc_stream.read(), default_doc, doc_name or str(doc_stream)
+      doc_stream.read(), default_doc, doc_name or str(doc_stream), validator
     )
 
-  def load_string(self, doc_string, default_doc=None, doc_name=None):
-    return self.load_obj(yaml.load(doc_string), default_doc, doc_name)
+  def load_string(self, doc_string, default_doc=None, doc_name=None,
+                  validator=None):
+    return self.load_obj(
+      yaml.load(doc_string), default_doc, doc_name, validator
+    )
 
-  def load_obj(self, doc_obj, default_doc=None, doc_name=None):
+  def load_obj(self, doc_obj, default_doc=None, doc_name=None, validator=None):
     doc = yamlicious.document.Document(self.new_env(), doc_obj, doc_name)
 
     if default_doc is not None:
       doc = default_doc.merge(doc, safe=False)
 
     doc.evaluate_feature_keys(self.keys)
+
+    if validator is not None:
+      doc.validate(validator)
 
     return doc

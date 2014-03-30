@@ -27,6 +27,10 @@ class FeatureKeyEvaluationError(Exception):
     )
 
 
+class DocumentValidationError(Exception):
+  pass
+
+
 def merge_objs(l, r, safe=True):
   if l is None:
     return r
@@ -147,6 +151,12 @@ class Document(object):
 
       for k in delkeys:
         del self._obj[k]
+
+  def validate(self, validator):
+    try:
+      voluptuous.Schema(validator)(self._obj)
+    except voluptuous.Invalid as e:
+      raise DocumentValidationError(e)
 
   def __eq__(self, other):
     return (hasattr(other, '_obj') and hasattr(other, 'env') and

@@ -2,10 +2,10 @@ import unittest
 
 import yamlicious.loader
 
-from test.util import make_stringio, make_fakefile
+import test.util
 
 
-class TestInclude(unittest.TestCase):
+class TestInclude(test.util.TestCase):
 
   loader_files = {}
   doc = ''
@@ -13,20 +13,14 @@ class TestInclude(unittest.TestCase):
 
   def runTest(self):
     loader = yamlicious.loader.Loader(
-      openfunc=make_fakefile(self.loader_files)
+      openfunc=self.make_fakefile(self.loader_files)
     )
 
-    if isinstance(self.expect, type) and issubclass(self.expect, Exception):
-      self.assertRaises(
-        self.expect,
-        loader.load_stream,
-        make_stringio(self.doc),
-      )
-    else:
-      self.assertEquals(
-        self.expect,
-        loader.load_stream(make_stringio(self.doc)).obj()
-      )
+    self.assertSelfExpect(
+      loader.load_stream,
+      lambda x: x.obj(),
+      self.make_stringio(self.doc),
+    )
 
 
 class SimpleInclude(TestInclude):
